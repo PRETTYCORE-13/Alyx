@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAMBIO DE CONTRASEÑA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jsrsasign@10.0.0/lib/jsrsasign-all-min.js"></script>
+    <style>
+        /* Tus estilos existentes */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #000000;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-weight: bold;
+        }
+
+        /* Estilo del contenedor del formulario */
+        .login-container {
+            background-color: #000000;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            /* Centrado del contenido dentro del contenedor */
+        }
+
+        /* Título */
+        h2 {
+            text-align: center;
+            color: #000000;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos de las etiquetas */
+        label {
+            font-size: 24px;
+            color: #ffffff;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* Estilos de los campos de entrada */
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        /* Estilo del botón */
+        input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #881ea8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+        }
+
+        /* Estilo para el texto del pie de página */
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #ffffff;
+            margin-top: 20px;
+        }
+
+        /* Estilo para la imagen circular */
+        .img-logo {
+            width: 20%;
+            /* Tamaño relativo */
+            height: 20%;
+            /* Tamaño relativo */
+            border-radius: 50%;
+            /* Hace la imagen circular */
+            background-color: #ffffff;
+            /* Fondo negro */
+            padding: 10px;
+            /* Espacio alrededor de la imagen */
+            margin: 0 auto 20px auto;
+            /* Centrado horizontal */
+            object-fit: cover;
+            /* Ajusta la imagen dentro del círculo */
+            margin-top: -30px;
+
+        }
+
+        /* Estilos responsivos */
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 20px;
+                max-width: 90%;
+            }
+
+            .img-logo {
+                width: 40%;
+                /* Aumentamos un poco el tamaño en pantallas pequeñas */
+                height: 40%;
+            }
+
+            h2 {
+                font-size: 16px;
+            }
+
+            label {
+                font-size: 20px;
+            }
+
+            input[type="submit"] {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                max-width: 90%;
+            }
+
+            .img-logo {
+                width: 50%;
+                height: 50%;
+            }
+
+            h2 {
+                font-size: 14px;
+            }
+
+            label {
+                font-size: 18px;
+            }
+
+            input[type="submit"] {
+                font-size: 12px;
+            }
+        }
+
+        .usu-ID {
+            color: white;
+            text-align: center;
+        }
+
+        .cont-ID {
+            height: 50px;
+            width: 100%;
+            background-color: rgb(89 0 111);
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            /* Centrado horizontal */
+            align-items: center;
+            /* Centrado vertical */
+        }
+
+        /* Más estilos... */
+        .json-preview {
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: monospace;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            max-width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <label for="username">Usuario:</label>
+            <div class="cont-ID">
+                <p class="usu-ID"></p>
+            </div>
+            <label for="password">Contraseña Nueva:</label>
+            <input type="password" id="password" name="password" required>
+            <input type="submit" value="Iniciar sesión">
+        </form>
+
+        <!-- Contenedor para mostrar el JSON enviado -->
+        <div id="jsonPreview" class="json-preview"></div>
+        <!-- Contenedor para mostrar la respuesta -->
+        <div id="responsePreview" class="json-preview"></div>
+    </div>
+
+
+
+    <script>
+        // Función para obtener el valor de un parámetro de la URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+    
+        // Obtener el valor del parámetro 'usu-ID' y mostrarlo en el HTML
+        const userId = getQueryParam('usu-ID');
+        if (userId) {
+            document.querySelector('.usu-ID').textContent = userId;
+        } else {
+            document.querySelector('.usu-ID').textContent = 'ID no disponible';
+        }
+    
+        // Función para verificar si la URL ha caducado (ejemplo: 5 minutos de validez)
+        function isLinkExpired() {
+            const linkTimestamp = localStorage.getItem('linkTimestamp');
+            if (!linkTimestamp) return true;
+            const currentTime = Date.now();
+            const expirationTime = 1 * 60 * 1000; // 5 minutos
+            return currentTime - linkTimestamp > expirationTime;
+        }
+    
+        // Si el enlace ha caducado, mostrar un mensaje y evitar el envío del formulario
+        if (isLinkExpired()) {
+            alert("El enlace ha caducado. Por favor, solicita uno nuevo.");
+            document.getElementById('loginForm').style.display = 'none';
+            document.querySelector('.usu-ID').textContent = 'Enlace caducado';
+        } else {
+            localStorage.setItem('linkTimestamp', Date.now()); // Marcar el tiempo de la primera carga
+        }
+    
+        // Manejo del envío del formulario
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault(); // Evitar el envío por defecto
+    
+            // Obtener valores de 'usu-ID' y 'password'
+            const password = document.getElementById('password').value;
+    
+            if (!userId || !password) {
+                alert('Por favor, completa todos los campos.');
+                return;
+            }
+    
+            // Crear el JSON a enviar
+            const data = {
+                id: userId,
+                password: password
+            };
+    
+            // Public key para encriptación
+            const publicKey = `-----BEGIN PUBLIC KEY-----
+            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr5vl8Vx9mibdm9fbjbT4
+            DEEEGnelccVTBeF16pnL+qOoXkxQXTdfttQfozh4sYGZ1+CWW4fuYcYPXgqB29Oh
+            jeAKMMPP7bqSst+pgFeVRZfI7jEdjcgduyf/Dm1iU7oo4fFDX11Wvoqsy1JTdp1G
+            HUUbSXlLPJrWK42YVT+9+dJ+O8igxCbSb2OA0cXHC1JrJFcDMS76mWZI/hZJd5WF
+            KfyLjWnOFrM9fJILq3pJF0uIfQfMY8oy7n6P7Yng3GR1pUixHJoaiRe6HghFkFxK
+            Nt12cksSTjOCbZisTs9PLu2qsv7eYlVlIjLdDOa089qcfKbjzL4vaV5+iI9+4Gx4
+            YwIDAQAB
+            -----END PUBLIC KEY-----`;
+    
+            try {
+                // Usa KEYUTIL para cargar la clave pública
+                const rsaKey = KEYUTIL.getKey(publicKey);
+    
+                // Convertir JSON a cadena
+                const dataString = JSON.stringify(data);
+    
+                // Encriptar el password usando la clave pública
+                const encryptedPasswordHex = KJUR.crypto.Cipher.encrypt(password, rsaKey);
+                const encryptedPasswordBase64 = hextob64(encryptedPasswordHex);
+    
+                // Crear el JSON con el password encriptado
+                const encryptedData = {
+                    id: userId,
+                    password: encryptedPasswordBase64
+                };
+    
+                // Mostrar el JSON encriptado en el contenedor
+                document.getElementById('jsonPreview').textContent = "JSON encriptado enviado al servidor:\n" + JSON.stringify(encryptedData, null, 2);
+    
+                // Enviar solicitud al API con el JSON encriptado
+                const response = await fetch('http://ecore.ath.cx:8091/api/Flutter/Password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(encryptedData)
+                });
+    
+                // Verificar respuesta del servidor
+                const result = await response.json();
+    
+                // Mostrar la respuesta en el contenedor
+                document.getElementById('responsePreview').textContent = "Respuesta del servidor:\n" + JSON.stringify(result, null, 2);
+    
+                // Mostrar alerta según el resultado
+                if (result.operationResult.success) {
+                    alert(`Respuesta del servidor: ${result.respuesta[0].respuesta}`);
+                } else {
+                    alert('Error: ' + (result.operationResult.errors[0] || 'Algo salió mal.'));
+                }
+            } catch (error) {
+                // Manejo de errores
+                alert('Hubo un error al conectar con el servidor.');
+                console.error('Error:', error);
+    
+                // Mostrar error en el contenedor de respuesta
+                document.getElementById('responsePreview').textContent = "Error al conectar con el servidor:\n" + error.message;
+            }
+        });
+    </script>
+            
+
+
+</body>
+
+</html>

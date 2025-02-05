@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ennova/Fac</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 95%;
+            margin: 20px auto;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px 20px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+			background-color: white;
+        }
+
+        th {
+			background-color: #000000;
+			color: #ffffff;
+			font-size: 18px;
+			text-align: center;  
+		    border-radius: 10px 10px 0 0;      }
+
+        tr:nth-child(even) {
+            background-color: #000000;
+			border-radius: 0px 0px 25px 25px;
+        }
+
+
+        .highlight {
+            background-color: #000000;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: none;
+        }
+
+        .footer {
+            font-size: 14px;
+            color: #ffffff;
+            text-align: center;
+            margin-top: 20px;
+			background-color: black;
+        }
+		.container {
+            width: 90%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+		@media (min-width: 769px) {
+            .container {
+            width: 80%;
+			}
+        }
+		.img-fb {
+			height: 20px;
+			vertical-align: top;
+			margin-right: 8px; /* Espacio entre imagen y texto */
+			margin-left: 8px;
+		  }
+		  .img-logo {
+			height: 40px;
+			margin-left: 60%;	
+		    margin-bottom: 10px;
+		}
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <table>
+        <tr>
+            <th colspan="2">
+				<img class="img-logo" src="https://ennovacore.com.mx/ennova_CORREO.png" alt="Logo Ennovacore"> 
+
+                <div style="font-size: 19px; text-align: center;">
+
+                    <strong>
+                        Se ha generado la factura a nombre de <br> 
+                        #NOMBRE_COMERCIAL#<br><br> 
+                        Se anexa al correo PDF y XML
+                    </strong>
+                </div>
+            </th>
+        </tr>
+        <tr>
+			
+            <td colspan="2">
+                <p><b>Estimado cliente,</b></p>
+                <p>
+                    Por medio de la presente, le informamos que Frog nos ha notificado un ajuste de precios del 
+                    <strong>4.72% (cuatro punto setenta y dos por ciento)</strong>, derivado del cálculo final del Índice Nacional de Precios al 
+                    Consumidor (INPC) correspondiente a diciembre de 2024, publicado en el Diario Oficial de la Federación.
+                </p>
+                <p>
+                    Este ajuste tiene como propósito que pueda considerar la actualización de sus precios, la cual será 
+                    efectiva a partir del <b>1 de febrero de 2025.</b> Este cambio es fundamental para garantizar la continuidad de un servicio 
+                    de calidad que cumpla con sus expectativas.
+                </p>
+                <p>
+                    Agradecemos su comprensión ante esta actualización y reiteramos nuestro compromiso de ofrecerle productos 
+                    y servicios con la excelencia que usted merece.
+                </p>
+                <p>Atentamente,<br>Uriel Sánchez / Ennovacore</p>
+            </td>
+        </tr>
+        <tr class="highlight" style="color: black;">
+            <td colspan="2"><strong>Concepto &nbsp;&nbsp;&nbsp;&nbsp; Monto: #MONTO#</strong></td>
+        </tr>
+        <tr>
+            <td colspan="2"><b>#CONCEPTOS#</b></td>
+        </tr>
+        <tr>
+            <th colspan="2">Datos Para Pago</th>
+        </tr>
+        <tr style="font-weight: bold;">
+            <td>Banco: #BANCO#</td>
+            <td>#NOMBRECTA#</td>
+        </tr>
+        <tr style="font-weight: bold;">
+            <td>Cuenta: #CUENTA#</td>
+            <td>Clabe: #CTACLABE#</td>
+        </tr>
+        <tr>
+            <td colspan="2" class="footer">
+                La cuenta de correo de Facturación (samufac15@gmail.com) no es monitoreada, por lo que todos los correos 
+                electrónicos respondidos a dicha cuenta serán ignorados.
+                <br><br>
+				<img class="img-fb" src="https://ennovacore.com.mx/IMAGENES/LOGO%20FB.png" alt=" Logo"> 
+                <a href="https://www.facebook.com/ennovamexico">@ennovamexico</a> /   
+				<img class="img-fb" src="https://ennovacore.com.mx/IMAGENES/LOGO%20WPP.png" alt=" Logo"> 
+				WhatsApp: 722.622.3971    /
+				<img class="img-fb" src="https://www.prettycore.xyz/IMAGENES/Logo%20Prettycore%20(8).png" alt=" Logo">         
+				<a href="https://prettycore.xyz/">prettycore.xyz</a> /   
+				<img class="img-fb" src="https://ennovacore.com.mx/IMAGENES/LOGO_ECORE.png" alt=" Logo">         
+				<a href="https://ennovacore.com.mx/">ennovacore.com.mx</a> /   
+
+			</td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

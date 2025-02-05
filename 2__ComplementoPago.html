@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAMBIO DE CONTRASEÑA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jsrsasign@10.0.0/lib/jsrsasign-all-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1-crypto-js.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #000000;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-weight: bold;
+        }
+
+        .login-container {
+            background-color: #000000;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            text-align: center;
+            color: #000000;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 24px;
+            color: #ffffff;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #881ea8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #ffffff;
+            margin-top: 20px;
+        }
+
+        .img-logo {
+            width: 20%;
+            height: 20%;
+            border-radius: 50%;
+            background-color: #ffffff;
+            padding: 10px;
+            margin: 0 auto 20px auto;
+            object-fit: cover;
+            margin-top: -30px;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 20px;
+                max-width: 90%;
+            }
+
+            .img-logo {
+                width: 40%;
+                height: 40%;
+            }
+
+            h2 {
+                font-size: 16px;
+            }
+
+            label {
+                font-size: 20px;
+            }
+
+            input[type="submit"] {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                max-width: 90%;
+            }
+
+            .img-logo {
+                width: 50%;
+                height: 50%;
+            }
+
+            h2 {
+                font-size: 14px;
+            }
+
+            label {
+                font-size: 18px;
+            }
+
+            input[type="submit"] {
+                font-size: 12px;
+            }
+        }
+
+        .usu-ID {
+            color: white;
+            text-align: center;
+        }
+
+        .cont-ID {
+            height: 50px;
+            width: 100%;
+            background-color: rgb(89 0 111);
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .json-preview {
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: monospace;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            max-width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <label for="username">Usuario:</label>
+            <div class="cont-ID">
+                <p class="usu-ID"></p>
+            </div>
+            <label for="password">Contraseña Nueva:</label>
+            <input type="password" id="password" name="password" required>
+            <input type="submit" value="Iniciar sesión">
+        </form>
+
+        <div id="jsonPreview" class="json-preview"></div>
+        <div id="responsePreview" class="json-preview"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js"></script>
+
+    <script>
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        const userId = getQueryParam('usu-ID');
+        if (userId) {
+            document.querySelector('.usu-ID').textContent = userId;
+        } else {
+            document.querySelector('.usu-ID').textContent = 'ID no disponible';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const password = document.getElementById('password').value;
+
+            if (!userId || !password) {
+                alert('Por favor, completa todos los campos.');
+                return;
+            }
+
+            const data = {
+                id: userId,
+                password: password
+            };
+
+            const publicKeyPEM = `-----BEGIN PUBLIC KEY-----
+            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr5vl8Vx9mibdm9fbjbT4
+            DEEEGnelccVTBeF16pnL+qOoXkxQXTdfttQfozh4sYGZ1+CWW4fuYcYPXgqB29Oh
+            jeAKMMPP7bqSst+pgFeVRZfI7jEdjcgduyf/Dm1iU7oo4fFDX11Wvoqsy1JTdp1G
+            HUUbSXlLPJrWK42YVT+9+dJ+O8igxCbSb2OA0cXHC1JrJFcDMS76mWZI/hZJd5WF
+            KfyLjWnOFrM9fJILq3pJF0uIfQfMY8oy7n6P7Yng3GR1pUixHJoaiRe6HghFkFxK
+            Nt12cksSTjOCbZisTs9PLu2qsv7eYlVlIjLdDOa089qcfKbjzL4vaV5+iI9+4Gx4
+            YwIDAQAB
+            -----END PUBLIC KEY-----`;
+
+            const rsa = new RSAKey();
+            try {
+                rsa.readPublicKeyFromPEMString(publicKeyPEM);
+            } catch (err) {
+                console.error('Error al leer la clave pública:', err);
+                alert('Error al procesar la clave pública.');
+                return;
+            }
+
+            let encryptedPassword = rsa.encrypt(password);
+            if (!encryptedPassword) {
+                alert('Error al encriptar la contraseña.');
+                return;
+            }
+
+            const base64Password = hextob64(encryptedPassword);
+
+            data.password = base64Password;
+
+            document.getElementById('jsonPreview').textContent = "JSON enviado al servidor:\n" + JSON.stringify(data, null, 2);
+
+            try {
+                const response = await fetch('http://ecore.ath.cx:8091/api/Flutter/Password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                document.getElementById('responsePreview').textContent = "Respuesta del servidor:\n" + JSON.stringify(result, null, 2);
+
+                if (result.operationResult.success) {
+                    alert(`Respuesta del servidor: ${result.respuesta[0].respuesta}`);
+                } else {
+                    alert('Error: ' + (result.operationResult.errors[0] || 'Algo salió mal.'));
+                }
+            } catch (error) {
+                alert('Hubo un error al conectar con el servidor.');
+                console.error('Error:', error);
+                document.getElementById('responsePreview').textContent = "Error al conectar con el servidor:\n" + error.message;
+            }
+            console.log('Clave pública:', publicKeyPEM);
+console.log('Datos antes de cifrar:', data);
+
+        });
+    </script>
+</body>
+
+</html>

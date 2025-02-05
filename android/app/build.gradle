@@ -1,0 +1,57 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // El plugin de Flutter debe estar después de los plugins de Android y Kotlin.
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace = "com.example.login"
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    defaultConfig {
+        // Cambia esto a un ID único para tu aplicación
+        applicationId = "com.example.login"
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("C:/Users/jesus/KEYS/my-release-key.jks")
+            storePassword "N0vacore"
+            keyAlias "my-key"
+            keyPassword "N0vacore"
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            // Cambia a `true` si deseas usar optimización de código.
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
+dependencies {
+    implementation "androidx.appcompat:appcompat:1.6.1" // Dependencia de compatibilidad
+    implementation "com.google.android.material:material:1.9.0" // Material Design
+}

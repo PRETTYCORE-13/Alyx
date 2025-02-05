@@ -1,0 +1,283 @@
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Tareas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+
+    }
+    h1 {
+      color: #ffffff;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+    }
+    .form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .form input, .form button {
+      padding: 0px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: bold;
+    }
+    .form button {
+      background-color: #5b0974;
+      color: white;
+      cursor: pointer;
+      border: none;
+      width: 100px;
+      font-weight: bold;
+    }
+    .form button:hover {
+      background-color: #8e33a9;
+    }
+    .task-list {
+      list-style: none;
+      padding: 0;
+    }
+    .task-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #5b0974;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+    }
+    
+    .task-row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: 10px;
+    }
+    
+
+    .chart-bar {
+      height: 40px;
+      margin: 17px 0;
+      line-height: 25px;
+      text-align: center;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      position: relative; /* Para posicionar el texto */
+      display: flex;
+      align-items: center;
+      justify-content: center; /* Centrar el texto */
+      overflow: hidden; /* Para evitar que el texto se desborde */
+    }
+            .task-item input[type="number"],
+    .task-item input[type="color"] {
+      margin-left: 10px;
+    }
+    .task-item input[type="text"] {
+      border: none;
+      font-size: 16px;
+      background: none;
+      color: white;
+      flex-grow: 1;
+      font-family: 'Poppins', sans-serif;
+      font-weight: bold;
+    }
+    .task-item input[type="text"]:focus {
+      outline: 2px solid #7e1b97;
+    }
+    .task-item button {
+      margin-left: 10px;
+      padding: 5px 10px;
+      background-color: #e53935;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+
+    }
+    .task-item button:hover {
+      background-color: #d32f2f;
+    }
+    .chart {
+      background-color: #ffffff;
+      border: 1px solid #ffffff;
+      border-radius: 5px;
+      padding: 20px;
+      width: 100%;
+      box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+    }
+
+    
+  </style>
+</head>
+<body>
+
+  <style>
+    .row {
+      display: flex;
+      gap: 20px; /* Espaciado entre columnas */
+    }
+  
+    .task-list {
+      flex: 1; /* Ocupa la mitad del espacio */
+      padding: 10px;
+    }
+  
+    .chart {
+      flex: 1; /* Ocupa la mitad del espacio */
+      border: 1px solid #ccc; /* Borde opcional para visualizar mejor */
+      padding: 10px;
+    }
+  </style>
+  
+  <h1>GESTIÓN DE TAREAS</h1>
+  <div class="container">
+    <form class="form" id="task-form">
+      <input type="text" id="task-name" placeholder="Nueva tarea" required>
+      <input type="color" id="task-color" value="#7e1b97">
+      <button type="submit">Agregar</button>
+    </form>
+  
+    <div class="row">
+      <ul class="task-list" id="task-list"></ul>
+      <div class="chart" id="chart"></div>
+    </div>
+  </div>
+  
+
+  
+  
+  
+  <style>
+    .by{
+        width: 200px;
+        margin-left: -80%;
+    }
+</style>
+  <div style="display: flex; justify-content: center; align-items: center;">
+        <img class="by" src="http://ennovacore.com.mx/HERRAMIENTAS/17.png" alt="">
+  </div>
+
+
+  <script>
+    const taskForm = document.getElementById('task-form');
+    const taskNameInput = document.getElementById('task-name');
+    const taskColorInput = document.getElementById('task-color');
+    const taskList = document.getElementById('task-list');
+    const chart = document.getElementById('chart');
+
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+    function renderChart() {
+      chart.innerHTML = '';
+      tasks.forEach(task => {
+        const bar = document.createElement('div');
+        bar.className = 'chart-bar';
+        bar.style.width = `${task.percentage}%`;
+        bar.style.backgroundColor = task.color;
+    
+        // Crear el texto del porcentaje
+        const percentageText = document.createElement('span');
+        percentageText.textContent = `${task.percentage}%`;
+        percentageText.style.position = 'absolute';
+        percentageText.style.width = '100%';
+        percentageText.style.textAlign = 'center';
+    
+        bar.appendChild(percentageText);
+        chart.appendChild(bar);
+      });
+    }
+    
+    function saveTasks() {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      renderChart();
+    }
+
+    function renderTasks() {
+      taskList.innerHTML = '';
+      tasks.forEach((task, index) => {
+        const taskItem = document.createElement('li');
+        taskItem.className = 'task-item';
+
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.value = task.name;
+        nameInput.addEventListener('input', () => {
+          tasks[index].name = nameInput.value;
+          saveTasks();
+        });
+
+        const percentageInput = document.createElement('input');
+        percentageInput.type = 'number';
+        percentageInput.min = '10';
+        percentageInput.max = '100';
+        percentageInput.value = task.percentage;
+        percentageInput.addEventListener('input', () => {
+          tasks[index].percentage = Math.min(Math.max(percentageInput.value, 0), 100);
+          saveTasks();
+        });
+
+        const colorInput = document.createElement('input');
+        colorInput.type = 'color';
+        colorInput.value = task.color;
+        colorInput.addEventListener('input', () => {
+          tasks[index].color = colorInput.value;
+          saveTasks();
+        });
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Eliminar';
+        deleteButton.addEventListener('click', () => {
+          tasks.splice(index, 1);
+          saveTasks();
+          renderTasks();
+        });
+
+        taskItem.appendChild(nameInput);
+        taskItem.appendChild(percentageInput);
+        taskItem.appendChild(colorInput);
+        taskItem.appendChild(deleteButton);
+        taskList.appendChild(taskItem);
+      });
+      renderChart();
+    }
+
+    taskForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const newTask = { name: taskNameInput.value, percentage: 0, color: taskColorInput.value };
+      tasks.push(newTask);
+      taskNameInput.value = '';
+      taskColorInput.value = '#7e1b97';
+      saveTasks();
+      renderTasks();
+    });
+
+    // Inicializar
+    renderTasks();
+    renderChart();
+  </script>
+
+
+
+
+</body>
+</html>
