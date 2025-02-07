@@ -1,18 +1,40 @@
                       Expanded(
-                        child: Text(
-                          '${venta['descProd'] ?? 'No disponible'}',
-                          style: TextStyle(color: Colors.white),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MapScreen(responseData: widget.responseData),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            height: 100,
+                            margin: EdgeInsets.all(10),
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  color: Colors.white,
+                                  size: 40,
+                                ),
+                                SizedBox(height: 5),
+                                Text(
+                                  'GEOUBICACIÓN',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-
-
-
-                                      Expanded(
-                  child: Text(
-                    'Producto',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),

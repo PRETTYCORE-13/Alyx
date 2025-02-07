@@ -8,6 +8,7 @@ import 'package:PRETTYCORE/homepage_usu.dart';
 import 'configuracion.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'img_dist.dart';
 
 class MapScreen extends StatefulWidget {
   final Map<String, dynamic> responseData;
@@ -124,7 +125,12 @@ class _MapScreenState extends State<MapScreen> {
   }
 
 @override
-Widget build(BuildContext context) {
+Widget build(BuildContext context) {          Positioned(
+            bottom: 20,
+            right: 20,
+            child: FloatingBubble(id: widget.responseData['usuarios'][0]['id'].toString()),
+          );
+
   return Scaffold(
     backgroundColor: Colors.white, // Fondo blanco para todo el Scaffold
     body: _center == null // Verifica si _center ha sido inicializado

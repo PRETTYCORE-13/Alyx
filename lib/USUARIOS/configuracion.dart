@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:PRETTYCORE/USUARIOS/perfil_page.dart';
+import 'Geoubicacion.dart';
+import 'img_dist.dart';  // Asegúrate de importar el archivo con FloatingBubble
 import 'new_ticket_page.dart';
 import 'AutorizacionesUsu.dart';
 import 'TckMes.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../login_page.dart';
 import '../homepage_usu.dart';
-import 'package:PRETTYCORE/USUARIOS/perfil_page.dart';
-import 'Geoubicacion.dart';
 
 class ConfiguracionUsu extends StatefulWidget {
   final dynamic responseData;
@@ -24,55 +25,51 @@ class _ConfiguracionUsuState extends State<ConfiguracionUsu> {
   Future<void> _showLogoutConfirmationDialog() async {
     showDialog(
       context: context,
-      barrierDismissible: false, // No se puede cerrar tocando fuera del cuadro
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.black, // Color de fondo del modal
+          backgroundColor: Colors.black,
           title: Text(
             '¿Estás seguro de que deseas salir?',
             style: TextStyle(
-              color: Colors.white, // Color de las letras del título
-              fontSize: 22, // Tamaño de la letra del título
+              color: Colors.white,
+              fontSize: 22,
             ),
           ),
           actions: <Widget>[
-            // Row para separar los botones
             Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween, // Separar botones
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context)
-                        .pop(); // Cierra el modal sin hacer logout
+                    Navigator.of(context).pop();
                   },
                   style: TextButton.styleFrom(
-                    backgroundColor: Colors.white, // Fondo blanco para el botón
+                    backgroundColor: Colors.white,
                   ),
                   child: Text(
                     'No',
                     style: TextStyle(
-                      color: Colors.purple, // Color del texto "No"
-                      fontSize: 28, // Tamaño de la letra del botón "No"
-                      fontWeight: FontWeight.bold, // Negrita
+                      color: Colors.purple,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
                 TextButton(
                   onPressed: () {
-                    _logout(); // Llama a la función de logout
-                    Navigator.of(context)
-                        .pop(); // Cierra el modal después de hacer logout
+                    _logout();
+                    Navigator.of(context).pop();
                   },
                   style: TextButton.styleFrom(
-                    backgroundColor: Colors.white, // Fondo blanco para el botón
+                    backgroundColor: Colors.white,
                   ),
                   child: Text(
                     'Sí',
                     style: TextStyle(
-                      color: Colors.purple, // Color del texto "Sí"
-                      fontSize: 28, // Tamaño de la letra del botón "Sí"
-                      fontWeight: FontWeight.bold, // Negrita
+                      color: Colors.purple,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -86,13 +83,9 @@ class _ConfiguracionUsuState extends State<ConfiguracionUsu> {
 
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Limpia las preferencias compartidas
-
-    // Aquí puedes limpiar cualquier otro estado que tengas en la aplicación
-    // Por ejemplo, si tienes un singleton o variables estáticas, reinícialas aquí
+    await prefs.clear();
 
     if (mounted) {
-      // Navega a la página de login y elimina todas las rutas anteriores
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => LoginPage()),
         (Route<dynamic> route) => false,
@@ -122,8 +115,7 @@ class _ConfiguracionUsuState extends State<ConfiguracionUsu> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              HomePageUsu(responseData: widget.responseData), // HomePageUsu
+          builder: (context) => HomePageUsu(responseData: widget.responseData),
         ),
       );
     }
@@ -143,11 +135,9 @@ class _ConfiguracionUsuState extends State<ConfiguracionUsu> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Fila para los botones de Perfil y Geoubicación
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Botón Perfil
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
@@ -190,51 +180,9 @@ class _ConfiguracionUsuState extends State<ConfiguracionUsu> {
                           ),
                         ),
                       ),
-
-// Botón Geoubicación
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    MapScreen(responseData: widget.responseData,), // Asegúrate de que GeoUbiPage esté definida
-                              ),
-                            );
-                          },
-                          child: Container(
-                            height: 100,
-                            margin: EdgeInsets.all(10),
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.location_on,
-                                  color: Colors.white,
-                                  size: 40,
-                                ),
-                                SizedBox(height: 5),
-                                Text(
-                                  'GEOUBICACIÓN',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
+
 
                   // Botón Salir (Cerrar sesión)
                   GestureDetector(
@@ -258,6 +206,9 @@ class _ConfiguracionUsuState extends State<ConfiguracionUsu> {
                   ),
                 ],
               ),
+              
+              // Aquí agregamos el FloatingBubble
+              FloatingBubble(id: widget.responseData['usuarios'][0]['id'].toString()),
             ],
           ),
         ),

@@ -10,6 +10,9 @@ import 'TckMes.dart';
 import 'configuracion.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'img_dist.dart';
+
+
 
 class PerfilPage extends StatefulWidget {
   final dynamic responseData;
@@ -409,20 +412,8 @@ class _PerfilPageState extends State<PerfilPage> {
       key: _scaffoldKey,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Perfil'),
+        title: Text(''),
         actions: [
-          TextButton(
-            child: Text('Gestionar', style: TextStyle(color: Colors.black)),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      GestionarPage(controllers: _controllers),
-                ),
-              );
-            },
-          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -447,6 +438,7 @@ class _PerfilPageState extends State<PerfilPage> {
                         ),
                       ),
                     ),
+
                     SizedBox(width: 20),
                     Text(
                       _nombreUsuario,
@@ -471,36 +463,6 @@ class _PerfilPageState extends State<PerfilPage> {
                       fontSize: MediaQuery.of(context).size.width *
                           0.05, // 5% del ancho de la pantalla
                       fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              GestionarPage(controllers: _controllers),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      'Gestionar',
-                      style: TextStyle(
-                        fontSize: MediaQuery.of(context).size.width *
-                            0.04, // 4% del ancho de la pantalla
-                        fontWeight: FontWeight.bold,
-                        color: const Color.fromARGB(255, 116, 15, 163),
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0),
-                      ),
                     ),
                   ),
                 ],

@@ -14,6 +14,8 @@ import 'dart:convert';
 import 'USUARIOS/pagos_perfil.dart';
 import '../login_page.dart';
 import '../homepage_usu.dart';
+import './USUARIOS/img_dist.dart';
+import 'USUARIOS/img_dist.dart';
 
 class HomePageUsu extends StatefulWidget {
   final dynamic responseData;
@@ -43,10 +45,11 @@ class _HomePageUsuState extends State<HomePageUsu> {
   String _tipoFac = '...';
   String _ruta = '...';
   String _cajas = '...';
-  String _utilidad = '...';
+  String _ventas = '...';
+  String _promociones = '...';
   String _imagen = ""; // Para almacenar la imagen base64
   int _selectedIndex = 1; // Índice seleccionado para el BottomNavigationBar
-  
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final double buttonWidth = 200.0;
 
@@ -79,8 +82,8 @@ class _HomePageUsuState extends State<HomePageUsu> {
         _tipoFac = 'Error: Datos no proporcionados';
         _ruta = 'Error: Datos no proporcionados';
         _cajas = 'Error: Datos no proporcionados';
-        _utilidad = 'Error: Datos no proporcionados';
-
+        _promociones = 'Error: Datos no proporcionados';
+        _ventas = 'Error: Datos no proporcionados';
       });
       print('Error: widget.responseData no contiene usuarios válidos');
       return;
@@ -122,7 +125,8 @@ class _HomePageUsuState extends State<HomePageUsu> {
             _ruta = user['ruta'] ?? 'Ruta no disponible';
             _imagen = user['imagen'] ?? ''; // Cargar la imagen base64
             _cajas = user['cajas'] ?? 'Cajas no disponible';
-            _utilidad = user['utilidad'] ?? 'Utilidad no disponible';
+            _ventas = user['ventas'] ?? 'Ventas no disponible';
+            _promociones = user['promociones'] ?? 'Promociones no disponible';
           });
         } else {
           print('Usuarios no disponibles en la respuesta');
@@ -151,7 +155,8 @@ class _HomePageUsuState extends State<HomePageUsu> {
         _ruta = 'Error de conexión';
         _tipoFac = 'Error de conexión';
         _cajas = 'Error de conexión';
-        _utilidad = 'Error de conexión';
+        _ventas = 'Error de conexión';
+        _promociones = 'Error de conexión';
       });
     }
   }
@@ -195,15 +200,16 @@ class _HomePageUsuState extends State<HomePageUsu> {
     Uint8List? bytes;
     if (_imagen.isNotEmpty) {
       try {
-        bytes = base64Decode(_imagen);
+        bytes = base64Decode(_imagen); // Decodificas la imagen base64
       } catch (e) {
         print('Error al decodificar la imagen base64: $e');
         bytes = null;
       }
     }
+// Usa el widget CircleImage
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.white, // Fondo blanco para toda la página
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           // Sección superior con fondo gris curvado
@@ -213,19 +219,21 @@ class _HomePageUsuState extends State<HomePageUsu> {
               Container(
                 height: 400,
                 decoration: const BoxDecoration(
-                  color: Color(0xFFE0E0E0), // Fondo gris claro
+                  color: Color(0xFFE0E0E0),
                   borderRadius: BorderRadius.only(
-                    bottomLeft:
-                        Radius.circular(220), // Curva inferior izquierda
-                    bottomRight: Radius.circular(220), // Curva inferior derecha
+                    bottomLeft: Radius.circular(220),
+                    bottomRight: Radius.circular(220),
                   ),
                 ),
               ),
+              FloatingBubble(
+                  id: _id), // Colócalo aquí fuera de la jerarquía normal
+
               // Contenido dentro del fondo curvado
               Column(
                 children: [
-                  const SizedBox(height: 100),
-                  // Contenedor circular para la imagen
+                  // Aquí mostramos la imagen con CircleImage
+                  const SizedBox(height: 10),
                   Center(
                     child: Container(
                       height: 180,
@@ -330,14 +338,14 @@ class _HomePageUsuState extends State<HomePageUsu> {
                     Column(
                       children: [
                         Text(
-                          _utilidad,
+                          _promociones,
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 5),
-                        Text("COMPRADO",
+                        Text("PROMOCIONES",
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[700],
@@ -348,14 +356,14 @@ class _HomePageUsuState extends State<HomePageUsu> {
                     Column(
                       children: [
                         Text(
-                          _utilidad,
+                          _ventas,
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 5),
-                        Text("GANANCIAS",
+                        Text("VENTAS",
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[700],
@@ -364,6 +372,7 @@ class _HomePageUsuState extends State<HomePageUsu> {
                     ),
                   ],
                 ),
+
                 // Iconos en la parte inferior
                 Expanded(
                   child: Column(
