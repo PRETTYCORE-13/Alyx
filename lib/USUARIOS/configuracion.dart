@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:PRETTYCORE/USUARIOS/perfil_page.dart';
 import 'Geoubicacion.dart';
-import 'img_dist.dart';  // Asegúrate de importar el archivo con FloatingBubble
-import 'new_ticket_page.dart';
-import 'AutorizacionesUsu.dart';
+import 'COMPONENTES/img_dist.dart';  // Asegúrate de importar el archivo con FloatingBubble
 import 'TckMes.dart';
 import '../login_page.dart';
 import '../homepage_usu.dart';

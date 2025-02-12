@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'tickets_page.dart';
-import 'new_ticket_page.dart';
 import 'configuracion.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'TckMes.dart';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'pagos_perfil.dart';
 import '../login_page.dart';
 import '../homepage_usu.dart';
-import 'img_dist.dart';
+import 'COMPONENTES/img_dist.dart';
 
 void main() {
   runApp(MyApp());

@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'login_page.dart';
-import 'USUARIOS/tickets_page.dart';
-import 'USUARIOS/new_ticket_page.dart';
 import 'USUARIOS/configuracion.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'USUARIOS/TckMes.dart';
 import 'dart:typed_data';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'USUARIOS/pagos_perfil.dart';
-import '../login_page.dart';
 import '../homepage_usu.dart';
-import './USUARIOS/img_dist.dart';
-import 'USUARIOS/img_dist.dart';
+import 'USUARIOS/COMPONENTES/img_dist.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class HomePageUsu extends StatefulWidget {
   final dynamic responseData;
@@ -27,6 +22,7 @@ class HomePageUsu extends StatefulWidget {
 }
 
 class _HomePageUsuState extends State<HomePageUsu> {
+  String _promocionales = "";
   String _nombreUsuario = '...';
   String _instancia = '...';
   String _rango = '...';
@@ -52,14 +48,159 @@ class _HomePageUsuState extends State<HomePageUsu> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final double buttonWidth = 200.0;
-
+   
   @override
   void initState() {
     super.initState();
+    _checkAndShowAd();
     _loadUserData();
+    _fetchAd(); // Llama a la función para obtener los datos de la promoción
   }
 
-  void _loadUserData() async {
+  bool _isAdShown = false; // Agregar un control para saber si ya se mostró el anuncio.
+
+  Future<void> _checkAndShowAd() async {
+    await _fetchAd();
+    if (_promocionales.isNotEmpty && !_isAdShown) {
+      setState(() {
+        _isAdShown = true; // Marcar que el anuncio ya ha sido mostrado.
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showAdDialog();
+      });
+    }
+  }
+
+  Future<void> _fetchAd() async {
+    try {
+      final String Id = widget.responseData['usuarios'][0]['id'].toString();
+      final String apiUrl = 'http://ecore.ath.cx:8091/api/Flutter/Promocionales/$Id';
+      print('Solicitando datos a: $apiUrl');
+
+      final response = await http.get(Uri.parse(apiUrl));
+      print('Código de respuesta: ${response.statusCode}');
+      print('Respuesta completa: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print('Datos decodificados: $data');
+
+        // Verifica si la clave 'promocionales' contiene datos
+        if (data['promocionales'] != null && data['promocionales'].isNotEmpty) {
+          var promocional = data['promocionales'][0]['promocionales'];  // Accede a la imagen base64
+          if (promocional != null && promocional.isNotEmpty) {
+            setState(() {
+              _promocionales = promocional;
+            });
+            print('Imagen base64 obtenida: ${_promocionales.substring(0, _promocionales.length > 50 ? 50 : _promocionales.length)}...');
+          } else {
+            print('No se encontró una imagen base64 en la respuesta de promocionales');
+          }
+        } else {
+          print('No se encontró ningún promocional en la respuesta');
+        }
+      } else {
+        print('Error en la solicitud: Código ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error al obtener el anuncio: $e");
+    }
+  }
+
+  void _showAdDialog() {
+    if (_promocionales.isEmpty) {
+      print("No hay imagen promocional para mostrar");
+      return;
+    }
+
+    print("Mostrando diálogo de anuncio");
+    Uint8List? imageBytes;
+    try {
+      imageBytes = base64Decode(_promocionales);
+    } catch (e) {
+      print("Error al decodificar la imagen base64: $e");
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false, // No se puede cerrar tocando fuera del diálogo.
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent, // Fondo transparente
+          insetPadding: EdgeInsets.zero, // Eliminar el padding por defecto
+          child: Stack(
+            children: [
+              // Imagen que ocupa todo el ancho de la pantalla
+              Container(
+                width: MediaQuery.of(context).size.width, // Ancho completo
+                child: Image.memory(
+                  imageBytes!,
+                  fit: BoxFit.cover, // Ajustar la imagen para cubrir todo el espacio
+                ),
+              ),
+              // Botón de cerrar (ícono de tache) con un contenedor blanco
+              Positioned(
+                top: 20, // Posición desde la parte superior
+                right: 20, // Posición desde la derecha
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white, // Fondo blanco
+                    borderRadius: BorderRadius.circular(20), // Borde redondeado
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.close, color: const Color.fromARGB(255, 111, 17, 129), size: 30), // Ícono de tache
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Cerrar el diálogo
+                      setState(() {
+                        _isAdShown = false; // Permite mostrar el anuncio nuevamente si fuera necesario
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastUpdated = prefs.getInt('lastUpdated') ?? 0;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final cacheDuration = 60 * 60 * 1000; // 60 minutos en milisegundos
+
+    if (now - lastUpdated < cacheDuration) {
+      // Si los datos están en caché y no han expirado, úsalos
+      setState(() {
+        _nombreUsuario = prefs.getString('nombreUsuario') ?? '...';
+        _instancia = prefs.getString('instancia') ?? '...';
+        _rango = prefs.getString('rango') ?? '...';
+        _id = prefs.getString('id') ?? '...';
+        _limiteCredito = prefs.getString('limiteCredito') ?? '...';
+        _giro = prefs.getString('giro') ?? '...';
+        _diasCredito = prefs.getString('diasCredito') ?? '...';
+        _razonSocial = prefs.getString('razonSocial') ?? '...';
+        _calle = prefs.getString('calle') ?? '...';
+        _colonia = prefs.getString('colonia') ?? '...';
+        _codigoPostal = prefs.getString('codigoPostal') ?? '...';
+        _estado = prefs.getString('estado') ?? '...';
+        _frecuencia = prefs.getString('frecuencia') ?? '...';
+        _edoCredito = prefs.getString('edoCredito') ?? '...';
+        _rfc = prefs.getString('rfc') ?? '...';
+        _tipoFac = prefs.getString('tipoFac') ?? '...';
+        _ruta = prefs.getString('ruta') ?? '...';
+        _cajas = prefs.getString('cajas') ?? '...';
+        _ventas = prefs.getString('ventas') ?? '...';
+        _promociones = prefs.getString('promociones') ?? '...';
+        _imagen = prefs.getString('imagen') ?? '';
+      });
+      return;
+    }
+
+    // Si los datos no están en caché o han expirado, obtén nuevos datos de la API
     if (widget.responseData == null ||
         widget.responseData['usuarios'] == null ||
         widget.responseData['usuarios'].isEmpty) {
@@ -128,6 +269,30 @@ class _HomePageUsuState extends State<HomePageUsu> {
             _ventas = user['ventas'] ?? 'Ventas no disponible';
             _promociones = user['promociones'] ?? 'Promociones no disponible';
           });
+
+          // Guardar los datos en caché
+          await prefs.setInt('lastUpdated', now);
+          await prefs.setString('nombreUsuario', _nombreUsuario);
+          await prefs.setString('instancia', _instancia);
+          await prefs.setString('rango', _rango);
+          await prefs.setString('id', _id);
+          await prefs.setString('limiteCredito', _limiteCredito);
+          await prefs.setString('giro', _giro);
+          await prefs.setString('diasCredito', _diasCredito);
+          await prefs.setString('razonSocial', _razonSocial);
+          await prefs.setString('calle', _calle);
+          await prefs.setString('colonia', _colonia);
+          await prefs.setString('codigoPostal', _codigoPostal);
+          await prefs.setString('estado', _estado);
+          await prefs.setString('frecuencia', _frecuencia);
+          await prefs.setString('edoCredito', _edoCredito);
+          await prefs.setString('rfc', _rfc);
+          await prefs.setString('tipoFac', _tipoFac);
+          await prefs.setString('ruta', _ruta);
+          await prefs.setString('cajas', _cajas);
+          await prefs.setString('ventas', _ventas);
+          await prefs.setString('promociones', _promociones);
+          await prefs.setString('imagen', _imagen);
         } else {
           print('Usuarios no disponibles en la respuesta');
         }
@@ -161,7 +326,48 @@ class _HomePageUsuState extends State<HomePageUsu> {
     }
   }
 
-// Aquí, extraemos el id y lo pasamos a la página TckMes
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      File imageFile = File(image.path);
+      List<int> imageBytes = await imageFile.readAsBytes();
+      String base64Image = base64Encode(imageBytes);
+
+      setState(() {
+        _imagen = base64Image; // Guardamos la imagen en la variable
+      });
+
+      _uploadImage(base64Image);
+    }
+  }
+
+  Future<void> _uploadImage(String base64Image) async {
+    final String apiUrl = 'http://ecore.ath.cx:8091/api/Flutter/Imagen';
+
+    final Map<String, dynamic> requestBody = {
+      "id": _id, // ID del usuario
+      "imagen": base64Image
+    };
+
+    try {
+      final response = await http.put(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        print("Imagen actualizada correctamente");
+      } else {
+        print("Error al subir la imagen: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Excepción al subir la imagen: $e");
+    }
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -206,7 +412,7 @@ class _HomePageUsuState extends State<HomePageUsu> {
         bytes = null;
       }
     }
-// Usa el widget CircleImage
+
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Colors.white,
@@ -232,37 +438,59 @@ class _HomePageUsuState extends State<HomePageUsu> {
               // Contenido dentro del fondo curvado
               Column(
                 children: [
+                  const SizedBox(height: 50),
+
                   // Aquí mostramos la imagen con CircleImage
                   const SizedBox(height: 10),
                   Center(
-                    child: Container(
-                      height: 180,
-                      width: 180,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white, // Fondo blanco para la imagen
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 8,
-                            offset: Offset(0, 4), // Sombra hacia abajo
-                          ),
-                        ],
-                      ),
-                      child: bytes != null
-                          ? ClipOval(
-                              child: Image.memory(
-                                bytes!,
-                                fit: BoxFit
-                                    .cover, // Ajustar la imagen dentro del círculo
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: 180,
+                          width: 180,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
                               ),
-                            )
-                          : Icon(
-                              Icons
-                                  .person, // Icono predeterminado si la imagen no está disponible
-                              size: 60,
-                              color: const Color.fromARGB(255, 114, 114, 114),
+                            ],
+                          ),
+                          child: bytes != null
+                              ? ClipOval(
+                                  child: Image.memory(
+                                    bytes!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : Icon(
+                                  Icons.person,
+                                  size: 60,
+                                  color: Colors.grey,
+                                ),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: InkWell(
+                            onTap:
+                                _pickImage, // Llamamos al método para seleccionar imagen
+                            child: CircleAvatar(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 141, 141, 141),
+                              radius: 20,
+                              child: Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                                size: 18,
+                              ),
                             ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 10),
