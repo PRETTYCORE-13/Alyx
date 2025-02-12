@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart'; // Importa el paquete
 import 'TckMes.dart';
-import 'package:PRETTYCORE/homepage_usu.dart';
+import '/homepage_usu.dart';
 import 'configuracion.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
